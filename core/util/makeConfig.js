@@ -1,12 +1,9 @@
 var path = require('path');
 var extendConfig = require('./extendConfig');
 
+const NON_CONFIG_COMMANDS = ['init', 'version', 'stop'];
+
 function projectPath (config) {
-  // Legacy mode, if the cwd is the backstop module
-  // if (config.backstop === process.cwd()) {
-  //   console.log('BackstopJS is running in legacy mode.');
-  //   return path.join(__dirname, '../../../..');
-  // }
   return process.cwd();
 }
 
@@ -33,24 +30,20 @@ function loadProjectConfig (command, options, config) {
   }
 
   var userConfig = {};
-  var CMD_REQUIRES_CONFIG = command !== 'genConfig';
+  const CMD_REQUIRES_CONFIG = !NON_CONFIG_COMMANDS.includes(command);
   if (CMD_REQUIRES_CONFIG) {
-    if (options && typeof options.config === 'object') {
-      console.log('User config detected.');
+    // This flow is confusing -- is checking for !config.backstopConfigFileName more reliable?
+    if (options && typeof options.config === 'object' && options.config.scenarios) {
+      console.log('Object-literal config detected.');
       if (options.config.debug) {
         console.log(JSON.stringify(options.config, null, 2));
       }
       userConfig = options.config;
     } else if (config.backstopConfigFileName) {
-      try {
-        // Remove from cache config content
-        +delete require.cache[require.resolve(config.backstopConfigFileName)];
-        console.log('Loading config: ', config.backstopConfigFileName, '\n');
-        userConfig = require(config.backstopConfigFileName);
-      } catch (e) {
-        console.error('Error ' + e);
-        process.exit(1);
-      }
+      // Remove from cache config content
+      delete require.cache[require.resolve(config.backstopConfigFileName)];
+      console.log('Loading config: ', config.backstopConfigFileName, '\n');
+      userConfig = require(config.backstopConfigFileName);
     }
   }
 
@@ -66,7 +59,7 @@ function makeConfig (command, options) {
   config.projectPath = projectPath(config);
   config.perf = {};
 
-  var userConfig = loadProjectConfig(command, options, config);
+  var userConfig = Object.assign({}, loadProjectConfig(command, options, config));
 
   return extendConfig(config, userConfig);
 }

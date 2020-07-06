@@ -5,15 +5,13 @@ import { filterTests } from '../../actions';
 
 import ButtonFilter from '../atoms/ButtonFilter';
 
-import { colors, fonts } from '../../styles';
-
 const ButtonsWrapper = styled.div`
   display: flex;
   flex: 0 0 auto;
   height: 100%;
 `;
 
-function ButtonsFilter(props) {
+function ButtonsFilter (props) {
   const availableStatus = props.availableStatus;
 
   const ListButton = availableStatus.map(status => (
@@ -34,13 +32,25 @@ function ButtonsFilter(props) {
 }
 
 class FiltersSwitch extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
+  render () {
     let tests = this.props.tests;
-    let availableStatus = this.props.availableStatus;
+    let availableStatus = [
+      {
+        id: 'all',
+        label: 'all',
+        count: tests.all.length
+      },
+      {
+        id: 'pass',
+        label: 'passed',
+        count: tests.all.filter(e => e.status === 'pass').length
+      },
+      {
+        id: 'fail',
+        label: 'failed',
+        count: tests.all.filter(e => e.status === 'fail').length
+      }
+    ];
 
     return (
       <ButtonsWrapper>
@@ -56,8 +66,7 @@ class FiltersSwitch extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    tests: state.tests,
-    availableStatus: state.availableStatus
+    tests: state.tests
   };
 };
 

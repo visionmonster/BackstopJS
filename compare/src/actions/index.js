@@ -1,3 +1,10 @@
+export const approveTest = id => {
+  return {
+    type: 'APPROVE_TEST',
+    id
+  };
+};
+
 export const filterTests = status => {
   return {
     type: 'FILTER_TESTS',
@@ -57,6 +64,13 @@ export const showScrubberRefImage = value => {
 export const showScrubberDiffImage = value => {
   return {
     type: 'SHOW_SCRUBBER_DIFF_IMAGE',
+    value
+  };
+};
+
+export const showScrubberDivergedImage = value => {
+  return {
+    type: 'SHOW_SCRUBBER_DIVERGED_IMAGE',
     value
   };
 };

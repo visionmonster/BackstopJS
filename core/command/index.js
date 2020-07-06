@@ -12,21 +12,27 @@ var logger = require('../util/logger')('COMMAND');
 
 /* Each and every command defined, including commands used in before/after */
 var commandNames = [
-  'genConfig',
+  'init',
+  'remote',
   'openReport',
   'reference',
   'report',
   'test',
-  'approve'
+  'approve',
+  'version',
+  'stop'
 ];
 
 /* Commands that are only exposed to higher levels */
 var exposedCommandNames = [
-  'genConfig',
+  'init',
+  'remote',
   'reference',
   'test',
   'openReport',
-  'approve'
+  'approve',
+  'version',
+  'stop'
 ];
 
 /* Used to convert an array of objects {name, execute} to a unique object {[name]: execute} */

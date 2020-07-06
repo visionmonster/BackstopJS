@@ -10,7 +10,7 @@ import NavButtons from '../atoms/NavButtons';
 
 // molecules
 import TestImages from '../molecules/TestImages';
-import ScrubberButton from '../molecules/ScrubberButton';
+import ApproveButton from '../molecules/ApproveButton';
 
 const CardWrapper = styled.div`
   position: relative;
@@ -26,8 +26,7 @@ const CardWrapper = styled.div`
     display: block;
     width: 8px;
     height: 100%;
-    background-color: ${props =>
-      props.status === 'pass' ? colors.green : colors.red};
+    background-color: ${props => props.status === 'pass' ? colors.green : colors.red};
     position: absolute;
     top: 0;
     left: 0;
@@ -37,18 +36,31 @@ const CardWrapper = styled.div`
   }
 `;
 
+const ButtonsWrapper = styled.div`
+  position: absolute;
+  right: 10px;
+  display: flex;
+`;
+
+// only show the diverged option if remote option is found
+function isRemoteOption () {
+  return /remote/.test(location.search);
+}
+
 export default class TestCard extends React.Component {
-  render() {
+  render () {
     let { pair: info, status } = this.props.test;
     let onlyText = this.props.onlyText;
 
     return (
       <CardWrapper id={this.props.id} status={status}>
-        {!onlyText && (
-          <NavButtons currentId={this.props.numId} lastId={this.props.lastId} />
-        )}
+        <ButtonsWrapper>
+          {status === 'fail' && isRemoteOption() && <ApproveButton fileName={info.fileName}/>}
+          {!onlyText && (
+            <NavButtons currentId={this.props.numId} lastId={this.props.lastId} />
+          )}
+        </ButtonsWrapper>
         <TextDetails info={info} />
-        <ScrubberButton info={info} onlyText={onlyText} />
         <TestImages info={info} status={status} />
         <ErrorMessages info={info} status={status} />
       </CardWrapper>

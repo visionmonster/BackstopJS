@@ -1,30 +1,13 @@
-var createBitmaps = require('../util/createBitmaps');
-var fs = require('../util/fs');
-var logger = require('../util/logger')('clean');
+const createBitmaps = require('../util/createBitmaps');
+const fs = require('../util/fs');
+const logger = require('../util/logger')('clean');
+const { shouldRunDocker, runDocker } = require('../util/runDocker');
+const engineErrors = require('../util/engineErrors');
 
 module.exports = {
   execute: function (config) {
-    if (config.args.docker) {
-        const passAlongArgs = process.argv
-                    .slice(3)
-                    .join(' ')
-                    .replace(/--docker/, '--moby');
-
-        const DOCKER_TEST = `docker run --rm -it --mount type=bind,source="$(pwd)",target=/src backstopjs/backstopjs reference ${passAlongArgs}`;
-        const { spawn } = require('child_process');
-        console.log('Delegating command to Docker...', DOCKER_TEST)
-
-    return new Promise((resolve, reject) => {   
-      const dockerProcess = spawn(DOCKER_TEST, {stdio: 'inherit', shell: true});
-      dockerProcess.on('exit', function (code, signal) {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject('');
-        }
-      });
-    });
-
+    if (shouldRunDocker(config)) {
+      return runDocker(config, 'reference');
     } else {
       var firstStep;
       // do not remove reference directory if we are in incremental mode
@@ -40,6 +23,7 @@ module.exports = {
         return createBitmaps(config, true);
       }).then(function () {
         console.log('\nRun `$ backstop test` to generate diff report.\n');
+        return engineErrors(config);
       });
     }
   }

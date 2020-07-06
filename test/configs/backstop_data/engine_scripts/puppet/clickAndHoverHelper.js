@@ -1,16 +1,24 @@
 module.exports = async (page, scenario) => {
-  var hoverSelector = scenario.hoverSelectors || scenario.hoverSelector;
-  var clickSelector = scenario.clickSelectors || scenario.clickSelector;
-  var scrollToSelector = scenario.scrollToSelector;
-  var postInteractionWait = scenario.postInteractionWait; // selector [str] | ms [int]
- 
+  const hoverSelector = scenario.hoverSelectors || scenario.hoverSelector;
+  const clickSelector = scenario.clickSelectors || scenario.clickSelector;
+  const keyPressSelector = scenario.keyPressSelectors || scenario.keyPressSelector;
+  const scrollToSelector = scenario.scrollToSelector;
+  const postInteractionWait = scenario.postInteractionWait; // selector [str] | ms [int]
+
+  if (keyPressSelector) {
+    for (const keyPressSelectorItem of [].concat(keyPressSelector)) {
+      await page.waitFor(keyPressSelectorItem.selector);
+      await page.type(keyPressSelectorItem.selector, keyPressSelectorItem.keyPress);
+    }
+  }
+
   if (hoverSelector) {
-    await page.waitFor(hoverSelector)
+    await page.waitFor(hoverSelector);
     await page.hover(hoverSelector);
   }
 
   if (clickSelector) {
-    await page.waitFor(clickSelector)
+    await page.waitFor(clickSelector);
     await page.click(clickSelector);
   }
 
